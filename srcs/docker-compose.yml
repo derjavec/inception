@@ -15,7 +15,7 @@ services:
     networks:
       - app-network
     ports:
-      - "3307:3306"
+      - "3306:3306"
 
   wordpress:
     build:
@@ -30,10 +30,10 @@ services:
       - wordpress_data:/var/www/wordpress
     networks:
       - app-network
-    ports:
-      - "9001:9000"
     depends_on:
       - mariadb
+    ports:
+      - "9000:9000"
 
   nginx:
     build:
@@ -43,10 +43,12 @@ services:
       - wordpress_data:/var/www/wordpress
     networks:
       - app-network
+    depends_on:
+      - wordpress
+    extra_hosts:
+    - "derjavec.42.fr:127.0.0.1"
     ports:
       - "8443:443"
-    depends_on:
-    - wordpress
 
 volumes:
   mariadb_data:
@@ -55,3 +57,4 @@ volumes:
 networks:
   app-network:
     driver: bridge
+

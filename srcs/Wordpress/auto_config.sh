@@ -14,10 +14,10 @@ chmod -R 755 /var/www/wordpress
 # Descargar WordPress si no está presente
 if [ ! -f /var/www/wordpress/wp-load.php ]; then
     echo "Descargando WordPress..."
-    wp core download --allow-root --path=/var/www/wordpress || {
-        echo "ERROR: No se pudo descargar WordPress.";
-        exit 1;
-    }
+    if ! wp core download --path='/var/www/wordpress' --locale=en_US --allow-root; then
+        echo "ERROR: Falló la descarga de WordPress."
+        exit 1
+    fi
 fi
 
 # Esperar a que MariaDB esté listo
@@ -33,18 +33,21 @@ while ! mysqladmin ping -h "$WORDPRESS_DB_HOST" -u "$WORDPRESS_DB_USER" -p"$WORD
     fi
 done
 
+# Asegurarse de que el directorio /run/php/ exista
+if [ ! -d /run/php ]; then
+    echo "Creando directorio /run/php/"
+    mkdir -p /run/php
+    chown -R www-data:www-data /run/php
+fi
+
 # Crear archivo wp-config.php si no existe
-if [ ! -f /var/www/wordpress/wp-config.php ]; then
+if [ -d "/var/www/wordpress" ] && [ ! -f "/var/www/wordpress/wp-config.php" ]; then
     echo "Creando archivo wp-config.php..."
-    wp config create --allow-root \
-        --dbname="$WORDPRESS_DB_NAME" \
-        --dbuser="$WORDPRESS_DB_USER" \
-        --dbpass="$WORDPRESS_DB_PASSWORD" \
-        --dbhost="$WORDPRESS_DB_HOST" \
-        --path='/var/www/wordpress' || {
-        echo "ERROR: No se pudo crear wp-config.php. Revisa permisos y rutas.";
-        exit 1;
-    }
+    if ! wp config create --path='/var/www/wordpress' \
+        --dbname=app_db --dbuser=derjavec --dbpass=1234 --dbhost=mariadb --allow-root; then
+        echo "ERROR: No se pudo crear wp-config.php."
+        exit 1
+    fi
 fi
 
 # Instalar WordPress si no está instalado
