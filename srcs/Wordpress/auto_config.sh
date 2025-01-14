@@ -56,13 +56,18 @@ if ! wp core is-installed --allow-root --path='/var/www/wordpress'; then
     wp core install --allow-root \
         --url="http://derjavec.42.fr" \
         --title="Mi sitio WordPress" \
-        --admin_user=admin \
-        --admin_password=admin_password \
-        --admin_email=admin@example.com \
+        --admin_user=derjavec \
+        --admin_password=pepe \
+        --admin_email=dnic.91@gmail.com \
         --path='/var/www/wordpress' || {
         echo "ERROR: No se pudo instalar WordPress.";
         exit 1;
     }
+    echo "Creando un segundo usuario..."
+    wp user create editor editor@example.com --role=editor --user_pass=editor_password --allow-root --path='/var/www/wordpress'
+
+    echo "Habilitando comentarios..."
+    wp option update default_comment_status open --allow-root --path='/var/www/wordpress'
 fi
 
 # Iniciar PHP-FPM
