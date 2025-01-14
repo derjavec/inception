@@ -8,9 +8,19 @@ RUN apt-get update && apt-get install -y \
     php-fpm \
     php-mysql \
     php-curl \
+    php-gd \
+    php-xml \
+    php-mbstring \
+    php-zip \
+    php-soap \
+    php-intl \
     unzip \
-    wget && \
+    wget \
+    strace \
+    lsof \
+    ca-certificates && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+
 
 RUN ln -s /usr/sbin/php-fpm7.4 /usr/sbin/php-fpm
 
