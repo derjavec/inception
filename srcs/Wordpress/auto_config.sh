@@ -10,13 +10,10 @@ if ! command -v ss &> /dev/null; then
 fi
 
 # Verificar que las variables de entorno estén definidas
-REQUIRED_VARS=("WORDPRESS_DB_HOST" "WORDPRESS_DB_USER" "WORDPRESS_DB_PASSWORD" "WORDPRESS_DB_NAME" "WORDPRESS_ADMIN_USER" "WORDPRESS_ADMIN_PASSWORD" "WORDPRESS_ADMIN_EMAIL")
-for VAR in "${REQUIRED_VARS[@]}"; do
-    if [ -z "${!VAR}" ]; then
-        echo "ERROR: La variable de entorno $VAR no está definida."
-        exit 1
-    fi
-done
+if [ -z "$WORDPRESS_DB_HOST" ] || [ -z "$WORDPRESS_DB_USER" ] || [ -z "$WORDPRESS_DB_PASSWORD" ] || [ -z "$WORDPRESS_DB_NAME" ]; then
+    echo "ERROR: Variables de entorno no definidas."
+    exit 1
+fi
 
 # Asegurarse de que el directorio de WordPress tenga permisos correctos
 echo "Verificando permisos para /var/www/wordpress..."
@@ -53,7 +50,7 @@ if [ ! -d /run/php ]; then
 fi
 
 # Crear archivo wp-config.php si no existe
-if [ ! -f "/var/www/wordpress/wp-config.php" ]; then
+if [ -d "/var/www/wordpress" ] && [ ! -f "/var/www/wordpress/wp-config.php" ]; then
     echo "Creando archivo wp-config.php..."
     if ! wp config create --path='/var/www/wordpress' \
         --dbname="$WORDPRESS_DB_NAME" --dbuser="$WORDPRESS_DB_USER" --dbpass="$WORDPRESS_DB_PASSWORD" --dbhost="$WORDPRESS_DB_HOST" --allow-root; then
@@ -82,23 +79,9 @@ if ! wp core is-installed --allow-root --path='/var/www/wordpress'; then
     wp option update default_comment_status open --allow-root --path='/var/www/wordpress'
 fi
 
-# Validar si el binario de php-fpm está disponible
-if ! command -v php-fpm &> /dev/null; then
-    echo "ERROR: php-fpm no está instalado."
-    exit 1
-fi
-
-# Verificar y reiniciar php-fpm si es necesario
-if ! ss -tuln | grep -q ":9000"; then
-    echo "Iniciando PHP-FPM..."
-    php-fpm8.1 -t || {
-        echo "ERROR: La configuración de PHP-FPM tiene errores.";
-        exit 1;
-    }
-fi
-
-# Iniciar PHP-FPM
-exec php-fpm8.1 -F
+# Iniciar PHP-FPM específicamente para 7.4
+echo "Iniciando PHP-FPM (versión 7.4)..."
+exec php-fpm7.4 -F
 
 
 
