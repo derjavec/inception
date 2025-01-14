@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Instalar la herramienta ss si no está instalada
+if ! command -v ss &> /dev/null; then
+    echo "Instalando la herramienta ss..."
+    apt-get update && apt-get install -y iproute2 || {
+        echo "ERROR: Falló la instalación de ss.";
+        exit 1;
+    }
+fi
+
 # Verificar que las variables de entorno estén definidas
 if [ -z "$WORDPRESS_DB_HOST" ] || [ -z "$WORDPRESS_DB_USER" ] || [ -z "$WORDPRESS_DB_PASSWORD" ] || [ -z "$WORDPRESS_DB_NAME" ]; then
     echo "ERROR: Variables de entorno no definidas."
@@ -44,7 +53,7 @@ fi
 if [ -d "/var/www/wordpress" ] && [ ! -f "/var/www/wordpress/wp-config.php" ]; then
     echo "Creando archivo wp-config.php..."
     if ! wp config create --path='/var/www/wordpress' \
-        --dbname=app_db --dbuser=derjavec --dbpass=1234 --dbhost=mariadb --allow-root; then
+        --dbname="$WORDPRESS_DB_NAME" --dbuser="$WORDPRESS_DB_USER" --dbpass="$WORDPRESS_DB_PASSWORD" --dbhost="$WORDPRESS_DB_HOST" --allow-root; then
         echo "ERROR: No se pudo crear wp-config.php."
         exit 1
     fi
@@ -56,9 +65,9 @@ if ! wp core is-installed --allow-root --path='/var/www/wordpress'; then
     wp core install --allow-root \
         --url="http://derjavec.42.fr" \
         --title="Mi sitio WordPress" \
-        --admin_user=derjavec \
-        --admin_password=pepe \
-        --admin_email=dnic.91@gmail.com \
+        --admin_user="$WORDPRESS_ADMIN_USER" \
+        --admin_password="$WORDPRESS_ADMIN_PASSWORD" \
+        --admin_email="$WORDPRESS_ADMIN_EMAIL" \
         --path='/var/www/wordpress' || {
         echo "ERROR: No se pudo instalar WordPress.";
         exit 1;
@@ -72,6 +81,7 @@ fi
 
 # Iniciar PHP-FPM
 exec php-fpm -F
+
 
 
 
