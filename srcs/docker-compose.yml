@@ -47,7 +47,7 @@ services:
     extra_hosts:
     - "derjavec.42.fr:127.0.0.1"
     ports:
-      - "8443:443"
+      - "443:443"
 
 volumes:
   mariadb_data:
