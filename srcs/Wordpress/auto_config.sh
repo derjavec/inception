@@ -29,19 +29,6 @@ if [ ! -f /var/www/wordpress/wp-load.php ]; then
     fi
 fi
 
-# Esperar a que MariaDB esté listo
-# attempt=1
-# max_retries=30
-# while ! mysqladmin ping -h "$WORDPRESS_DB_HOST" -u "$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" --silent; do
-#     echo "Esperando a que MariaDB esté listo... (Intento $attempt/$max_retries)"
-#     sleep 2
-#     attempt=$((attempt + 1))
-#     if [ $attempt -gt $max_retries ]; then
-#         echo "ERROR: No se pudo conectar a MariaDB después de $max_retries intentos."
-#         exit 1
-#     fi
-# done
-
 # Verificar conexión a la base de datos
 echo "Verificando conexión a la base de datos..."
 echo "SHOW DATABASES;" | mysql -h "$WORDPRESS_DB_HOST" -u "$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD"
@@ -80,9 +67,31 @@ else
     exit 1
 fi
 
+# Instalar WordPress si no está instalado
+if ! wp core is-installed --allow-root --path='/var/www/wordpress'; then
+    echo "Instalando WordPress..."
+    wp core install --allow-root \
+        --url="https://derjavec.42.fr:8443" \
+        --title="Mi Sitio WordPress" \
+        --admin_user="derjavec" \
+        --admin_password="1234" \
+        --admin_email="dnic.91@gmail.com" \
+        --path="/var/www/wordpress" || {
+        echo "ERROR: No se pudo instalar WordPress."
+        exit 1
+    }
+
+    echo "Creando un segundo usuario..."
+    wp user create editor editor@example.com --role=editor --user_pass=editor_password --allow-root --path='/var/www/wordpress'
+
+    echo "Habilitando comentarios..."
+    wp option update default_comment_status open --allow-root --path='/var/www/wordpress'
+fi
+
 # Iniciar PHP-FPM específicamente para 7.4
 echo "Iniciando PHP-FPM (versión 7.4)..."
 exec php-fpm7.4 -F
+
 
 
 
