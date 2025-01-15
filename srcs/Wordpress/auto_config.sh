@@ -67,6 +67,22 @@ else
     exit 1
 fi
 
+echo "Verificando conexión a la base de datos..."
+echo "SHOW DATABASES;" | mysql -h "$WORDPRESS_DB_HOST" -u "$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD"
+if [ $? -ne 0 ]; then
+    echo "ERROR: No se puede conectar a la base de datos."
+    exit 1
+fi
+
+# Resetear la base de datos si ya existe
+echo "Reseteando la base de datos..."
+if wp db reset --yes --allow-root --path='/var/www/wordpress'; then
+    echo "Base de datos reseteada exitosamente."
+else
+    echo "ERROR: No se pudo resetear la base de datos. Verifica conexión a MariaDB."
+    exit 1
+fi
+
 # Instalar WordPress si no está instalado
 if ! wp core is-installed --allow-root --path='/var/www/wordpress'; then
     echo "Instalando WordPress..."
