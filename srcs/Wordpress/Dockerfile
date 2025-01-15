@@ -21,7 +21,6 @@ RUN apt-get update && apt-get install -y \
     ca-certificates && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-
 RUN ln -s /usr/sbin/php-fpm7.4 /usr/sbin/php-fpm
 
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
@@ -36,10 +35,19 @@ RUN mkdir -p /var/www/wordpress && \
 RUN mkdir -p /run/php/ && \
     chown -R www-data:www-data /run/php/
 
+# Copiar el archivo wp-config.php al contenedor
+COPY conf/wp-config.php /var/www/wordpress/wp-config.php
+RUN chmod 644 /var/www/wordpress/wp-config.php && \
+    chown www-data:www-data /var/www/wordpress/wp-config.php
+
+# Copiar la configuración personalizada de PHP-FPM
 COPY conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
+
+# Copiar y configurar el script de inicialización
 COPY auto_config.sh /auto_config.sh
 RUN chmod +x /auto_config.sh
+
 WORKDIR /var/www/wordpress
 EXPOSE 9000
-ENTRYPOINT ["/auto_config.sh"]
 
+ENTRYPOINT ["/auto_config.sh"]

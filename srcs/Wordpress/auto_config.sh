@@ -42,11 +42,12 @@ while ! mysqladmin ping -h "$WORDPRESS_DB_HOST" -u "$WORDPRESS_DB_USER" -p"$WORD
     fi
 done
 
-# Asegurarse de que el directorio /run/php/ exista
-if [ ! -d /run/php ]; then
-    echo "Creando directorio /run/php/"
-    mkdir -p /run/php
-    chown -R www-data:www-data /run/php
+# Verificar conexión a la base de datos
+echo "Verificando conexión a la base de datos..."
+echo "SHOW DATABASES;" | mysql -h "$WORDPRESS_DB_HOST" -u "$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD"
+if [ $? -ne 0 ]; then
+    echo "ERROR: No se puede conectar a la base de datos."
+    exit 1
 fi
 
 # Crear archivo wp-config.php si no existe
@@ -59,24 +60,13 @@ if [ -d "/var/www/wordpress" ] && [ ! -f "/var/www/wordpress/wp-config.php" ]; t
     fi
 fi
 
-# Instalar WordPress si no está instalado
-if ! wp core is-installed --allow-root --path='/var/www/wordpress'; then
-    echo "Instalando WordPress..."
-    wp core install --allow-root \
-        --url="https://derjavec.42.fr" \
-        --title="Mi sitio WordPress" \
-        --admin_user="$WORDPRESS_ADMIN_USER" \
-        --admin_password="$WORDPRESS_ADMIN_PASSWORD" \
-        --admin_email="$WORDPRESS_ADMIN_EMAIL" \
-        --path='/var/www/wordpress' || {
-        echo "ERROR: No se pudo instalar WordPress.";
-        exit 1;
-    }
-    echo "Creando un segundo usuario..."
-    wp user create editor editor@example.com --role=editor --user_pass=editor_password --allow-root --path='/var/www/wordpress'
-
-    echo "Habilitando comentarios..."
-    wp option update default_comment_status open --allow-root --path='/var/www/wordpress'
+# Verificar contenido de wp-config.php
+if [ -f "/var/www/wordpress/wp-config.php" ]; then
+    echo "El archivo wp-config.php existe. Contenido:"
+    cat /var/www/wordpress/wp-config.php
+else
+    echo "ERROR: No se generó wp-config.php correctamente."
+    exit 1
 fi
 
 # Iniciar PHP-FPM específicamente para 7.4
