@@ -60,9 +60,20 @@ if [ -d "/var/www/wordpress" ] && [ ! -f "/var/www/wordpress/wp-config.php" ]; t
     fi
 fi
 
+# Sobrescribir wp-config.php con tu archivo personalizado
+if [ -f "/conf/wp-config.php" ]; then
+    echo "Sobrescribiendo wp-config.php con archivo personalizado..."
+    cp /conf/wp-config.php /var/www/wordpress/wp-config.php
+    chown www-data:www-data /var/www/wordpress/wp-config.php
+    chmod 644 /var/www/wordpress/wp-config.php
+else
+    echo "ERROR: No se encontró el archivo personalizado /conf/wp-config.php"
+    exit 1
+fi
+
 # Verificar contenido de wp-config.php
 if [ -f "/var/www/wordpress/wp-config.php" ]; then
-    echo "El archivo wp-config.php existe. Contenido:"
+    echo "El archivo wp-config.php final está configurado. Contenido:"
     cat /var/www/wordpress/wp-config.php
 else
     echo "ERROR: No se generó wp-config.php correctamente."
@@ -72,6 +83,7 @@ fi
 # Iniciar PHP-FPM específicamente para 7.4
 echo "Iniciando PHP-FPM (versión 7.4)..."
 exec php-fpm7.4 -F
+
 
 
 
