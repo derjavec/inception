@@ -87,11 +87,11 @@ fi
 if ! wp core is-installed --allow-root --path='/var/www/wordpress'; then
     echo "Instalando WordPress..."
     wp core install --allow-root \
-        --url="https://derjavec.42.fr" \
-        --title="Mi Sitio WordPress" \
-        --admin_user="derjavec" \
-        --admin_password="1234" \
-        --admin_email="dnic.91@gmail.com" \
+        --url="${WORDPRESS_URL}" \
+        --title="${WORDPRESS_TITLE}" \
+        --admin_user="${WORDPRESS_ADMIN_USER}" \
+        --admin_password="${WORDPRESS_ADMIN_PASSWORD}" \
+        --admin_email="${WORDPRESS_ADMIN_EMAIL}" \
         --path="/var/www/wordpress" || {
         echo "ERROR: No se pudo instalar WordPress."
         exit 1

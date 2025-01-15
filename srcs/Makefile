@@ -1,14 +1,39 @@
-COMPOSE_FILE = docker-compose.yml
-build:
-	docker-compose -f $(COMPOSE_FILE) build
-default: up
+name = inception
 
-up:
-	docker-compose -f $(COMPOSE_FILE) up -d
+COMPOSE_FILE = docker-compose.yml
+
+DATA_DIR = ~/data
+WORDPRESS_DIR = $(DATA_DIR)/wordpress
+MARIADB_DIR = $(DATA_DIR)/mariadb
+
+all:
+	@printf "Launching configuration $(name)...\n"
+	@mkdir -p $(WORDPRESS_DIR) $(MARIADB_DIR)
+	@docker compose -f ./srcs/$(COMPOSE_FILE) --env-file srcs/.env up -d
+
+build:
+	@printf "Building configuration $(name)...\n"
+	@mkdir -p $(WORDPRESS_DIR) $(MARIADB_DIR)
+	@docker compose -f ./srcs/$(COMPOSE_FILE) --env-file srcs/.env build
+
 down:
-	docker-compose -f $(COMPOSE_FILE) down
+	@printf "Stopping configuration $(name)...\n"
+	@docker compose -f ./srcs/$(COMPOSE_FILE) --env-file srcs/.env down
+
+re:
+	@printf "Rebuilding configuration $(name)...\n"
+	@docker compose -f ./srcs/$(COMPOSE_FILE) --env-file srcs/.env down
+	@docker compose -f ./srcs/$(COMPOSE_FILE) --env-file srcs/.env up -d --build
+
 clean: down
-	docker system prune -f
-	docker volume prune -f
-rebuild: down build up
-.PHONY: build up down clean rebuild
+	@printf "Cleaning configuration $(name)...\n"
+	@sudo rm -rf $(WORDPRESS_DIR) $(MARIADB_DIR)
+	@docker system prune -a --force
+
+fclean: clean
+	@printf "Performing a full Docker cleanup...\n"
+	@docker compose -f ./srcs/$(COMPOSE_FILE) down -v
+	@docker system prune --all --force --volumes
+	@sudo rm -rf $(WORDPRESS_DIR) $(MARIADB_DIR)
+
+.PHONY: all build down re clean fclean
