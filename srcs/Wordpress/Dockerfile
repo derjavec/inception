@@ -35,6 +35,11 @@ RUN mkdir -p /var/www/wordpress && \
 RUN mkdir -p /run/php/ && \
     chown -R www-data:www-data /run/php/
 
+# Copiar el archivo wp-config.php al contenedor
+COPY conf/wp-config.php /var/www/wordpress/wp-config.php
+RUN chmod 644 /var/www/wordpress/wp-config.php && \
+    chown www-data:www-data /var/www/wordpress/wp-config.php
+
 # Copiar la configuración personalizada de PHP-FPM
 COPY conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
 
