@@ -30,17 +30,17 @@ if [ ! -f /var/www/wordpress/wp-load.php ]; then
 fi
 
 # Esperar a que MariaDB esté listo
-attempt=1
-max_retries=30
-while ! mysqladmin ping -h "$WORDPRESS_DB_HOST" -u "$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" --silent; do
-    echo "Esperando a que MariaDB esté listo... (Intento $attempt/$max_retries)"
-    sleep 2
-    attempt=$((attempt + 1))
-    if [ $attempt -gt $max_retries ]; then
-        echo "ERROR: No se pudo conectar a MariaDB después de $max_retries intentos."
-        exit 1
-    fi
-done
+# attempt=1
+# max_retries=30
+# while ! mysqladmin ping -h "$WORDPRESS_DB_HOST" -u "$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" --silent; do
+#     echo "Esperando a que MariaDB esté listo... (Intento $attempt/$max_retries)"
+#     sleep 2
+#     attempt=$((attempt + 1))
+#     if [ $attempt -gt $max_retries ]; then
+#         echo "ERROR: No se pudo conectar a MariaDB después de $max_retries intentos."
+#         exit 1
+#     fi
+# done
 
 # Verificar conexión a la base de datos
 echo "Verificando conexión a la base de datos..."
