@@ -1,6 +1,6 @@
 name = inception
 
-COMPOSE_FILE = docker-compose.yml
+COMPOSE_FILE = srcs/docker-compose.yml
 COMPOSE_CMD = docker compose -f ./$(COMPOSE_FILE) --env-file srcs/.env
 
 DATA_DIR = ~/data
