@@ -3,7 +3,7 @@ name = inception
 COMPOSE_FILE = srcs/docker-compose.yml
 COMPOSE_CMD = docker compose -f ./$(COMPOSE_FILE) --env-file srcs/.env
 
-DATA_DIR = derjavec/data
+DATA_DIR = ~/derjavec/data
 WORDPRESS_DIR = $(DATA_DIR)/wordpress
 MARIADB_DIR = $(DATA_DIR)/mariadb
 
