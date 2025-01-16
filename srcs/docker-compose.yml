@@ -61,13 +61,13 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ~/data/mariadb
+      device: derjavec/data/mariadb
   wordpress_data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ~/data/wordpress
+      device: derjavec/data/wordpress
 
 networks:
   inception-network:
