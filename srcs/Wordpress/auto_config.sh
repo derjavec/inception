@@ -98,7 +98,7 @@ if ! wp core is-installed --allow-root --path='/var/www/wordpress'; then
     }
 
     echo "Creando un segundo usuario..."
-    wp user create editor editor@example.com --role=editor --user_pass=editor_password --allow-root --path='/var/www/wordpress'
+    wp user create editor editor@example.com --role=editor --user_pass=1234 --allow-root --path='/var/www/wordpress'
 
     echo "Habilitando comentarios..."
     wp option update default_comment_status open --allow-root --path='/var/www/wordpress'
