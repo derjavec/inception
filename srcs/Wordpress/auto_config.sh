@@ -74,14 +74,14 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Resetear la base de datos si ya existe
-echo "Reseteando la base de datos..."
-if wp db reset --yes --allow-root --path='/var/www/wordpress'; then
-    echo "Base de datos reseteada exitosamente."
-else
-    echo "ERROR: No se pudo resetear la base de datos. Verifica conexión a MariaDB."
-    exit 1
-fi
+# # Resetear la base de datos si ya existe
+# echo "Reseteando la base de datos..."
+# if wp db reset --yes --allow-root --path='/var/www/wordpress'; then
+#     echo "Base de datos reseteada exitosamente."
+# else
+#     echo "ERROR: No se pudo resetear la base de datos. Verifica conexión a MariaDB."
+#     exit 1
+# fi
 
 # Instalar WordPress si no está instalado
 if ! wp core is-installed --allow-root --path='/var/www/wordpress'; then
@@ -89,9 +89,9 @@ if ! wp core is-installed --allow-root --path='/var/www/wordpress'; then
     wp core install --allow-root \
         --url="${WORDPRESS_URL}" \
         --title="My not so incredible wordpress site" \
-        --admin_user="${WORDPRESS_ADMIN_USER}" \
-        --admin_password="${WORDPRESS_ADMIN_PASSWORD}" \
-        --admin_email="${WORDPRESS_ADMIN_EMAIL}" \
+        --admin_user="$WORDPRESS_ADMIN_USER" \
+        --admin_password="$WORDPRESS_ADMIN_PASSWORD" \
+        --admin_email="$WORDPRESS_ADMIN_EMAIL" \
         --path="/var/www/wordpress" || {
         echo "ERROR: No se pudo instalar WordPress."
         exit 1

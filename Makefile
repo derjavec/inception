@@ -1,7 +1,7 @@
 name = inception
 
 COMPOSE_FILE = docker-compose.yml
-COMPOSE_CMD = docker compose -f ./$(COMPOSE_FILE) --env-file ./.env
+COMPOSE_CMD = docker compose -f ./$(COMPOSE_FILE) --env-file srcs/.env
 
 DATA_DIR = ~/data
 WORDPRESS_DIR = $(DATA_DIR)/wordpress
@@ -25,7 +25,7 @@ down:
 re:
 	printf "Rebuilding configuration $(name)...\n"
 	$(COMPOSE_CMD) down
-	$(COMPOSE_CMD) up -d --build
+	$(COMPOSE_CMD) up -d
 
 clean: down
 	printf "Cleaning configuration $(name)...\n"
